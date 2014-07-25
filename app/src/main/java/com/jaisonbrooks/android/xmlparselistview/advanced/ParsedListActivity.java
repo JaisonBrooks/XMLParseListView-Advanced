@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Created by jbrooks on 7/25/2014
@@ -35,6 +37,7 @@ public class ParsedListActivity extends Activity {
     ArrayList<DataFeed> mFeedList;
     ListView _lv;
     ListAdapter listAdapter;
+    Set<DataFeed> data_set;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +86,7 @@ public class ParsedListActivity extends Activity {
         protected void onPreExecute() {
             prog = new ProgressDialog(context);
             prog.setMessage("Loading....");
+            prog.setCancelable(false);
             prog.show();
         }
 
@@ -99,8 +103,11 @@ public class ParsedListActivity extends Activity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                 listAdapter = new ListAdapter(context, result);
-                _lv.setAdapter(listAdapter);
+                 listAdapter = new ListAdapter(context, mFeedList);
+                    int count = listAdapter.getCount();
+                    if (count !=0 && listAdapter !=null) {
+                        _lv.setAdapter(listAdapter);
+                    }
                 }
             });
         }
@@ -135,28 +142,68 @@ public class ParsedListActivity extends Activity {
                 }
             }); //listAdapter.notifyDataSetChanged();
         }
-        if (id == R.id.action_remove_dups) {
-            listAdapter.sort(new Comparator<DataFeed>() {
-                @Override
-                public int compare(DataFeed dataFeed, DataFeed dataFeed2) {
-                    if (dataFeed.getTitle().matches(dataFeed2.getTitle())) {
-                        Toast.makeText(context, "Dupes found", Toast.LENGTH_SHORT).show();
-                    }
-                    return 0;
-                }
-            });
+        if (id == R.id.action_remove_dupes) {
+//            Set suggestion = new HashSet();
+//            suggestion.add()
+            System.out.println("\nHere are the duplicate elements from list : " + findDuplicates(mFeedList));
+        }
+        if (id == R.id.action_remove_all_dupes) {
+            //listAdapter.add(data);
         }
          if (id == R.id.action_show_dupes) {
-             listAdapter.sort(new Comparator<DataFeed>() {
-                 @Override
-                 public int compare(DataFeed dataFeed, DataFeed dataFeed2) {
-                     dataFeed.getTitle().equals(dataFeed2.getTitle());
-                     return 1;
-                 }
-             });
+             data_set = new HashSet<DataFeed>();
+             int count = mFeedList.size();
+
+
+            // ArrayList<DataFeed> arrItems = new ArrayList<DataFeed>();
+            // add objects to the arrItems including duplicates
+             HashSet noDuplicateSet = new HashSet();
+             noDuplicateSet.addAll(mFeedList);
+             mFeedList.clear();
+             mFeedList.addAll(noDuplicateSet);
+             listAdapter.notifyDataSetChanged();
+
+//             for (int i=0; i < count; i++) {
+//                 for (int j=0; j < count; j++) {
+//                     if (mFeedList.get(i).getTitle().equals(mFeedList.get(j).getTitle())) {
+//                         DataFeed feed = mFeedList.get(i);
+//                         DataFeed feed2 = mFeedList.get(j);
+//                         data_set.add(feed);
+//                         System.out.println("data_ste.add(feed)" + feed.getTitle() + " "  + feed2.getTitle());
+//                     }
+//                 }
+//             }
+//
+//             if (!data_set.isEmpty()) {
+//                 listAdapter.clear();
+//                 ArrayList<DataFeed> al = new ArrayList<DataFeed>();
+//                 al.addAll(data_set);
+//
+//                 System.out.println(al.toArray().toString());
+//                 mFeedList = al;
+//                 listAdapter.notifyDataSetChanged();
+//
+//             }
          }
 
-
         return super.onOptionsItemSelected(item);
+    }
+
+    public static Set<DataFeed> findDuplicates(ArrayList<DataFeed> listContainingDuplicates) {
+
+        final Set<DataFeed> setToReturn = new HashSet<DataFeed>();
+        final Set<DataFeed> set1 = new HashSet<DataFeed>();
+
+        for (DataFeed yourInt : listContainingDuplicates) {
+            String TITLE = yourInt.getTitle();
+            if (TITLE.matches(yourInt.getTitle())) {
+                setToReturn.add(yourInt);
+            }
+
+            if (!set1.add(yourInt)) {
+                setToReturn.add(yourInt);
+            }
+        }
+        return setToReturn;
     }
 }

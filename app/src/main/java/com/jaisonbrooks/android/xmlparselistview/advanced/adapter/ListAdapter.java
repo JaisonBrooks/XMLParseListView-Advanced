@@ -34,6 +34,11 @@ public class ListAdapter extends ArrayAdapter<DataFeed> {
     }
 
     @Override
+    public DataFeed getItem(int position) {
+        return super.getItem(position);
+    }
+
+    @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
         DataFeed data = getItem(position);

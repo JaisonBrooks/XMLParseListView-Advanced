@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.jaisonbrooks.android.xmlparselistview.advanced.model.DataFeed;
+import com.jaisonbrooks.android.xmlparselistview.advanced.model.Titles;
 
 import org.apache.http.ParseException;
 import org.xmlpull.v1.XmlPullParser;
@@ -29,6 +30,7 @@ public class XmlParser {
 
     private ArrayList<DataFeed> feedList;
     private DataFeed feed;
+    private Titles feed_titles;
 
     private String tagName;
     private Context context;
@@ -39,6 +41,8 @@ public class XmlParser {
     public static final String SUBTITLE = "subtitle";
     public static final String DESCRIPTION = "description";
     public static final String ID = "id";
+
+    public static final String TITLES= "titles";
 
     public String title = "";
     public String subtitle = "";
@@ -77,8 +81,10 @@ public class XmlParser {
                     case XmlPullParser.START_DOCUMENT:
                         break;
                     case XmlPullParser.START_TAG:
+
                         if (tagName.equals(ITEM)) {
                             feed = new DataFeed();
+                            id = Integer.parseInt(parser.getAttributeValue(null, "id"));
                         }
                         if (tagName.equals(TITLE)) {
                             title = parser.nextText().toString();
@@ -88,9 +94,6 @@ public class XmlParser {
                         }
                         if (tagName.equals(DESCRIPTION)) {
                             description = parser.nextText().toString();
-                        }
-                        if (tagName.equals(ID)) {
-                            id = Integer.parseInt(parser.nextText().toString());
                         }
                         break;
                     case XmlPullParser.END_TAG:
