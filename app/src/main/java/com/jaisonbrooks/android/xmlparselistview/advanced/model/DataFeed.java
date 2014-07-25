@@ -11,14 +11,16 @@ public class DataFeed implements Serializable {
     private String title;
     private String subtitle;
     private String description;
+    private int id;
 
     public DataFeed() {
     }
 
-    public DataFeed(String title, String subtitle, String description) {
+    public DataFeed(String title, String subtitle, String description, int id) {
         this.title = title;
         this.subtitle = subtitle;
         this.description = description;
+        this.id = id;
     }
     public String getTitle() {
         return title;
@@ -28,6 +30,9 @@ public class DataFeed implements Serializable {
     }
     public String getDescription() {
         return description;
+    }
+    public int getId() {
+        return id;
     }
 
     public void setTitle(String title) {
@@ -39,5 +44,6 @@ public class DataFeed implements Serializable {
     public void setDescription(String description) {
         this.description = description;
     }
+    public void setId(int id) { this.id = id; }
 
 }

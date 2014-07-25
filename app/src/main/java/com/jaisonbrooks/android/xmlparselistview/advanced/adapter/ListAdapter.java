@@ -25,6 +25,7 @@ public class ListAdapter extends ArrayAdapter<DataFeed> {
         TextView title;
         TextView subtitle;
         TextView description;
+        TextView id;
     }
 
     public ListAdapter(Context context, ArrayList<DataFeed> data) {
@@ -45,6 +46,7 @@ public class ListAdapter extends ArrayAdapter<DataFeed> {
             viewHolder.title = (TextView) convertView.findViewById(R.id.title);
             viewHolder.subtitle = (TextView) convertView.findViewById(R.id.subtitle);
             viewHolder.description = (TextView) convertView.findViewById(R.id.description);
+            viewHolder.id = (TextView) convertView.findViewById(R.id.id);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -53,6 +55,7 @@ public class ListAdapter extends ArrayAdapter<DataFeed> {
         viewHolder.title.setText(data.getTitle());
         viewHolder.subtitle.setText(data.getSubtitle());
         viewHolder.description.setText(data.getDescription());
+        viewHolder.id.setText(Integer.toString(data.getId()));
 
         // Return the completed view to render on screen
         return convertView;

@@ -1,5 +1,6 @@
 package com.jaisonbrooks.android.xmlparselistview.advanced;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -20,6 +21,7 @@ import com.jaisonbrooks.android.xmlparselistview.advanced.utils.XmlParser;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 
 /**
  * Created by jbrooks on 7/25/2014
@@ -40,8 +42,17 @@ public class ParsedListActivity extends Activity {
         context = this;
         setContentView(R.layout.activity_parsed_list);
         setupListView();
+        setupActionbar();
 
     }
+
+    private void setupActionbar() {
+        ActionBar ab = getActionBar();
+        if (ab != null) {
+            ab.setDisplayShowHomeEnabled(false);
+        }
+    }
+
     public void setupListView() {
         _lv = (ListView) findViewById(R.id.listView);
         new DoRssFeedTask().execute();
@@ -49,6 +60,15 @@ public class ParsedListActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Toast.makeText(context, "Hello " + mFeedList.get(i).getTitle(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        _lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(context, "Removed " + mFeedList.get(i).getTitle(), Toast.LENGTH_SHORT).show();
+                mFeedList.remove(i);
+                listAdapter.notifyDataSetChanged();
+                return true;
             }
         });
 
@@ -113,9 +133,30 @@ public class ParsedListActivity extends Activity {
                 public int compare(DataFeed dataFeed, DataFeed dataFeed2) {
                     return dataFeed.getTitle().compareTo(dataFeed2.getTitle());
                 }
-            });
-            //listAdapter.notifyDataSetChanged();
+            }); //listAdapter.notifyDataSetChanged();
         }
+        if (id == R.id.action_remove_dups) {
+            listAdapter.sort(new Comparator<DataFeed>() {
+                @Override
+                public int compare(DataFeed dataFeed, DataFeed dataFeed2) {
+                    if (dataFeed.getTitle().matches(dataFeed2.getTitle())) {
+                        Toast.makeText(context, "Dupes found", Toast.LENGTH_SHORT).show();
+                    }
+                    return 0;
+                }
+            });
+        }
+         if (id == R.id.action_show_dupes) {
+             listAdapter.sort(new Comparator<DataFeed>() {
+                 @Override
+                 public int compare(DataFeed dataFeed, DataFeed dataFeed2) {
+                     dataFeed.getTitle().equals(dataFeed2.getTitle());
+                     return 1;
+                 }
+             });
+         }
+
+
         return super.onOptionsItemSelected(item);
     }
 }

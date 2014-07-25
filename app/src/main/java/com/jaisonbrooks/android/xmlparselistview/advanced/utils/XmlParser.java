@@ -38,10 +38,12 @@ public class XmlParser {
     public static final String TITLE = "title";
     public static final String SUBTITLE = "subtitle";
     public static final String DESCRIPTION = "description";
+    public static final String ID = "id";
 
     public String title = "";
     public String subtitle = "";
     public String description = "";
+    public int id = 0;
 
     public XmlParser(Context context) {
         this.context = context;
@@ -87,12 +89,15 @@ public class XmlParser {
                         if (tagName.equals(DESCRIPTION)) {
                             description = parser.nextText().toString();
                         }
+                        if (tagName.equals(ID)) {
+                            id = Integer.parseInt(parser.nextText().toString());
+                        }
                         break;
                     case XmlPullParser.END_TAG:
                         if (tagName.equals(CHANNEL)) {
                             done = true;
                         } else if (tagName.equals(ITEM)) {
-                            feed = new DataFeed(title, subtitle, description);
+                            feed = new DataFeed(title, subtitle, description, id);
                             feedList.add(feed);
                         }
                         break;

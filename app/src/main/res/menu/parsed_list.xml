@@ -15,6 +15,17 @@
         android:showAsAction="always" />
     <item android:id="@+id/action_sort"
         android:title="Sort"
+        android:icon="@drawable/ic_action_sort"
         android:orderInCategory="3"
-        android:showAsAction="ifRoom" />
+        android:showAsAction="always" />
+    <item android:id="@+id/action_remove_dups"
+        android:title="Remove Duplicates"
+        android:orderInCategory="4"
+        android:showAsAction="always" />
+    <item android:id="@+id/action_show_dupes"
+        android:title="Show Dupes"
+        android:orderInCategory="6"
+        android:showAsAction="ifRoom"/>
 </menu>
+
+    <!-- Sort Icon accredited to > http://www.flaticon.com/free-icon/sort-by-alphabet_25608 -->
