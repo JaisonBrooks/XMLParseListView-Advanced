@@ -13,12 +13,13 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.jaisonbrooks.android.xmlparselistview.R;
 import com.jaisonbrooks.android.xmlparselistview.advanced.adapter.ListAdapter;
 import com.jaisonbrooks.android.xmlparselistview.advanced.model.DataFeed;
 import com.jaisonbrooks.android.xmlparselistview.advanced.utils.XmlParser;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by jbrooks on 7/25/2014
@@ -31,6 +32,7 @@ public class ParsedListActivity extends Activity {
     XmlParser parser;
     ArrayList<DataFeed> mFeedList;
     ListView _lv;
+    ListAdapter listAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +79,7 @@ public class ParsedListActivity extends Activity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                 ListAdapter listAdapter = new ListAdapter(context, result);
+                 listAdapter = new ListAdapter(context, result);
                 _lv.setAdapter(listAdapter);
                 }
             });
@@ -97,8 +99,22 @@ public class ParsedListActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_refresh) {
+            new DoRssFeedTask().execute();
             return true;
+        }
+        if (id == R.id.action_clear) {
+            listAdapter.clear();
+            return true;
+        }
+        if (id == R.id.action_sort) {
+            listAdapter.sort(new Comparator<DataFeed>() {
+                @Override
+                public int compare(DataFeed dataFeed, DataFeed dataFeed2) {
+                    return dataFeed.getTitle().compareTo(dataFeed2.getTitle());
+                }
+            });
+            //listAdapter.notifyDataSetChanged();
         }
         return super.onOptionsItemSelected(item);
     }

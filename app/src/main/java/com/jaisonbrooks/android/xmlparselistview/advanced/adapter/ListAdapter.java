@@ -7,8 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.jaisonbrooks.android.xmlparselistview.advanced.R;
 import com.jaisonbrooks.android.xmlparselistview.advanced.model.DataFeed;
-import com.jaisonbrooks.android.xmlparselistview.R;
 
 import java.util.ArrayList;
 
