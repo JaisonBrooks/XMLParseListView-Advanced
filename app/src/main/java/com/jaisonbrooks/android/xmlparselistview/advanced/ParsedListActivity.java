@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,7 +12,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jaisonbrooks.android.xmlparselistview.advanced.adapter.ListAdapter;
@@ -19,10 +22,8 @@ import com.jaisonbrooks.android.xmlparselistview.advanced.model.DataFeed;
 import com.jaisonbrooks.android.xmlparselistview.advanced.utils.XmlParser;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -52,29 +53,13 @@ public class ParsedListActivity extends Activity {
     private void setupActionbar() {
         ActionBar ab = getActionBar();
         if (ab != null) {
-            ab.setDisplayShowHomeEnabled(false);
+            ab.setDisplayShowHomeEnabled(true);
         }
     }
 
     public void setupListView() {
         _lv = (ListView) findViewById(R.id.listView);
         new DoRssFeedTask().execute();
-        _lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(context, "Hello " + mFeedList.get(i).getTitle(), Toast.LENGTH_SHORT).show();
-            }
-        });
-        _lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(context, "Removed " + mFeedList.get(i).getTitle(), Toast.LENGTH_SHORT).show();
-                mFeedList.remove(i);
-                listAdapter.notifyDataSetChanged();
-                return true;
-            }
-        });
-
     }
 
     public class DoRssFeedTask extends AsyncTask<String, Void, ArrayList<DataFeed>> {
@@ -107,10 +92,29 @@ public class ParsedListActivity extends Activity {
                     int count = listAdapter.getCount();
                     if (count !=0 && listAdapter !=null) {
                         _lv.setAdapter(listAdapter);
+                        setupListViewItemClick();
                     }
                 }
             });
         }
+    }
+
+    private void setupListViewItemClick() {
+        _lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(context, "Hello " + listAdapter.getItem(i).getTitle(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        _lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(context, "Removed " + listAdapter.getItem(i).getTitle(), Toast.LENGTH_SHORT).show();
+                listAdapter.remove(listAdapter.getItem(i));
+                listAdapter.notifyDataSetChanged();
+                return true;
+            }
+        });
     }
 
     @Override
@@ -140,70 +144,97 @@ public class ParsedListActivity extends Activity {
                 public int compare(DataFeed dataFeed, DataFeed dataFeed2) {
                     return dataFeed.getTitle().compareTo(dataFeed2.getTitle());
                 }
-            }); //listAdapter.notifyDataSetChanged();
+            });
         }
-        if (id == R.id.action_remove_dupes) {
-//            Set suggestion = new HashSet();
-//            suggestion.add()
-            System.out.println("\nHere are the duplicate elements from list : " + findDuplicates(mFeedList));
-        }
+
         if (id == R.id.action_remove_all_dupes) {
-            //listAdapter.add(data);
+
+            // mFeedList // ArrayList<DataFeed>
+            // listAdapter // ListAdapter
+            // _lv // ListView
+
+            ArrayList<DataFeed> list_non_dupes = new ArrayList<DataFeed>();
+            for (int i=0; i < mFeedList.size(); i++) {
+                DataFeed obj = mFeedList.get(i);
+                String TITLE = obj.getTitle();
+                int TITLE_ID = obj.getId();
+                for (int j = 0; j < mFeedList.size(); j++) {
+                    DataFeed obj_to_comparse = mFeedList.get(j);
+                    String TITLE_TO_COMPARE = obj_to_comparse.getTitle();
+                    int TITLE_TO_COMPARE_ID = obj_to_comparse.getId();
+
+                    if (!TITLE.matches(TITLE_TO_COMPARE)) {
+                        if (TITLE_ID != TITLE_TO_COMPARE_ID) {
+                            if (!list_non_dupes.contains(obj_to_comparse)) {
+                                list_non_dupes.add(obj_to_comparse);
+                            }
+                        }
+                    } else if (TITLE_ID != TITLE_TO_COMPARE_ID) {
+                        if (list_non_dupes.contains(obj_to_comparse)) {
+                            list_non_dupes.remove(obj_to_comparse);
+                        } else {
+                            list_non_dupes.add(obj_to_comparse);
+                        }
+                    }
+                }
+            }
+
+            if (!list_non_dupes.isEmpty()) {
+                listAdapter = new ListAdapter(context, list_non_dupes);
+                listAdapter.sort(new Comparator<DataFeed>() {
+                    @Override
+                    public int compare(DataFeed dataFeed, DataFeed dataFeed2) {
+                        return dataFeed.getTitle().compareTo(dataFeed2.getTitle());
+                    }
+                });
+                _lv.setAdapter(listAdapter);
+                setupListViewItemClick();
+            }
+
+
         }
+
          if (id == R.id.action_show_dupes) {
-             data_set = new HashSet<DataFeed>();
-             int count = mFeedList.size();
 
+             // mFeedList // ArrayList<DataFeed>
+             // listAdapter // ListAdapter
+             // _lv // ListView
 
-            // ArrayList<DataFeed> arrItems = new ArrayList<DataFeed>();
-            // add objects to the arrItems including duplicates
-             HashSet noDuplicateSet = new HashSet();
-             noDuplicateSet.addAll(mFeedList);
-             mFeedList.clear();
-             mFeedList.addAll(noDuplicateSet);
-             listAdapter.notifyDataSetChanged();
+             ArrayList<DataFeed> list_dupes = new ArrayList<DataFeed>();
 
-//             for (int i=0; i < count; i++) {
-//                 for (int j=0; j < count; j++) {
-//                     if (mFeedList.get(i).getTitle().equals(mFeedList.get(j).getTitle())) {
-//                         DataFeed feed = mFeedList.get(i);
-//                         DataFeed feed2 = mFeedList.get(j);
-//                         data_set.add(feed);
-//                         System.out.println("data_ste.add(feed)" + feed.getTitle() + " "  + feed2.getTitle());
-//                     }
-//                 }
-//             }
-//
-//             if (!data_set.isEmpty()) {
-//                 listAdapter.clear();
-//                 ArrayList<DataFeed> al = new ArrayList<DataFeed>();
-//                 al.addAll(data_set);
-//
-//                 System.out.println(al.toArray().toString());
-//                 mFeedList = al;
-//                 listAdapter.notifyDataSetChanged();
-//
-//             }
+             for (int i=0; i < mFeedList.size(); i++) {
+                 DataFeed obj = mFeedList.get(i);
+                 String TITLE = obj.getTitle();
+                 int TITLE_ID = obj.getId();
+                 for (int j = 0; j < mFeedList.size(); j++) {
+                     DataFeed obj_to_comparse = mFeedList.get(j);
+                     String TITLE_TO_COMPARE = obj_to_comparse.getTitle();
+                     int TITLE_TO_COMPARE_ID = obj_to_comparse.getId();
+
+                     if (TITLE.matches(TITLE_TO_COMPARE)) {
+                         if (TITLE_ID != TITLE_TO_COMPARE_ID) {
+                             if (!list_dupes.contains(obj_to_comparse)) {
+                                 list_dupes.add(obj_to_comparse);
+                             }
+                         }
+                     }
+                 }
+             }
+
+             if (!list_dupes.isEmpty()) {
+                 listAdapter = new ListAdapter(context, list_dupes);
+                 listAdapter.sort(new Comparator<DataFeed>() {
+                     @Override
+                     public int compare(DataFeed dataFeed, DataFeed dataFeed2) {
+                         return dataFeed.getTitle().compareTo(dataFeed2.getTitle());
+                     }
+                 });
+                 _lv.setAdapter(listAdapter);
+                 setupListViewItemClick();
+             }
          }
 
         return super.onOptionsItemSelected(item);
     }
 
-    public static Set<DataFeed> findDuplicates(ArrayList<DataFeed> listContainingDuplicates) {
-
-        final Set<DataFeed> setToReturn = new HashSet<DataFeed>();
-        final Set<DataFeed> set1 = new HashSet<DataFeed>();
-
-        for (DataFeed yourInt : listContainingDuplicates) {
-            String TITLE = yourInt.getTitle();
-            if (TITLE.matches(yourInt.getTitle())) {
-                setToReturn.add(yourInt);
-            }
-
-            if (!set1.add(yourInt)) {
-                setToReturn.add(yourInt);
-            }
-        }
-        return setToReturn;
-    }
 }

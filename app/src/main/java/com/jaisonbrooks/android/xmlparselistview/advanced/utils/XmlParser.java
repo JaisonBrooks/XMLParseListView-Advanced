@@ -29,6 +29,7 @@ public class XmlParser {
     private XmlPullParser parser;
 
     private ArrayList<DataFeed> feedList;
+    public ArrayList<Titles> titlesList;
     private DataFeed feed;
     private Titles feed_titles;
 
@@ -61,8 +62,8 @@ public class XmlParser {
             String URL = "http://greenbot.org/jaisonbrooks/jones.xml";
             URL url = new URL(URL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setReadTimeout(10 * 1000);
-            connection.setConnectTimeout(10 * 1000);
+            connection.setReadTimeout(10000 /* milliseconds */);
+            connection.setConnectTimeout(15000 /* milliseconds */);
             connection.setRequestMethod("GET");
             connection.setDoInput(true);
             connection.connect();
@@ -75,6 +76,7 @@ public class XmlParser {
             int eventType = parser.getEventType();
             boolean done = false;
             feedList = new ArrayList<DataFeed>();
+            titlesList = new ArrayList<Titles>();
             while (eventType != XmlPullParser.END_DOCUMENT && !done) {
                 tagName = parser.getName();
                 switch (eventType) {
@@ -84,8 +86,21 @@ public class XmlParser {
 
                         if (tagName.equals(ITEM)) {
                             feed = new DataFeed();
-                            id = Integer.parseInt(parser.getAttributeValue(null, "id"));
+                            id = Integer.parseInt(parser.getAttributeValue(null, ID));
                         }
+                        if (tagName.equals("titles")) {
+                            feed_titles = new Titles();
+                            if (tagName.equals(TITLE)) {
+                                feed_titles.setTitle(parser.nextText().toString());
+                            }
+                            if (tagName.equals(SUBTITLE)) {
+                                feed_titles.setSubtitle(parser.nextText().toString());
+                            }
+                            if (tagName.equals(DESCRIPTION)) {
+                                feed_titles.setDescription(parser.nextText().toString());
+                            }
+                        }
+
                         if (tagName.equals(TITLE)) {
                             title = parser.nextText().toString();
                         }
@@ -118,5 +133,9 @@ public class XmlParser {
         }
 
     return feedList;
+    }
+
+    public ArrayList<Titles> getTitlesList() {
+        return titlesList;
     }
 }
