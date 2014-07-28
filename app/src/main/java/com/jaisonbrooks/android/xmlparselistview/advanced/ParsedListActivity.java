@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,9 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jaisonbrooks.android.xmlparselistview.advanced.adapter.ListAdapter;
@@ -23,13 +20,10 @@ import com.jaisonbrooks.android.xmlparselistview.advanced.utils.XmlParser;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by jbrooks on 7/25/2014
  */
-
 
 public class ParsedListActivity extends Activity {
 
@@ -38,7 +32,6 @@ public class ParsedListActivity extends Activity {
     ArrayList<DataFeed> mFeedList;
     ListView _lv;
     ListAdapter listAdapter;
-    Set<DataFeed> data_set;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +40,6 @@ public class ParsedListActivity extends Activity {
         setContentView(R.layout.activity_parsed_list);
         setupListView();
         setupActionbar();
-
     }
 
     private void setupActionbar() {
